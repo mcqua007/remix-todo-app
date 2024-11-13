@@ -152,7 +152,7 @@ export default function Home() {
                     </p>
                   </div>
                   {task.dueDate && (
-                    <time className="text-xs text-gray-500 dark:text-gray-200 border border-gray-500 dark:border-gray-200 border-solid rounded-full w-20 h-6 px-1.5 py-1 flex items-center justify-center group-data-[overdue=true]:border-red-500 group-data-[overdue=true]:text-red-500">
+                    <time className="text-xs text-gray-500 dark:text-gray-200 border border-gray-500 dark:border-gray-200 border-solid rounded-full w-20 h-6 px-1.5 py-1 flex items-center justify-center group-data-[overdue=true]:border-red-500 group-data-[overdue=true]:text-red-500 group-data-[overdue=false]:group-data-[complete=true]:border-green-700 group-data-[overdue=false]:group-data-[complete=true]:text-green-700">
                       {new Date(task.dueDate).toLocaleDateString()}
                     </time>
                   )}

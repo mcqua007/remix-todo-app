@@ -174,7 +174,8 @@ export default function Home() {
                 Clear Completed
               </button>
               <button
-                className="text-red-400 transition hover:text-red-600"
+                className="text-red-400 transition hover:text-red-600 disabled:opacity-60 disabled:pointer-events-none"
+                disabled={tasks.length === 0}
                 onClick={() => deleteAllTasks()}
               >
                 Delete All

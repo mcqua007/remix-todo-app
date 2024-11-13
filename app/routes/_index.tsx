@@ -1,10 +1,10 @@
 import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getTasks, updateTask, Task, Tasks } from "~/lib/task-api";
-
 import Checkbox from "~/components/checkbox";
+
 export const meta: MetaFunction = () => {
   return [
     { title: "Todo App" },
@@ -48,23 +48,29 @@ export default function Home() {
     const isComplete = event.target.checked;
     // Optimistically Update the task state locally
     setTasks((prevTasks: Tasks) =>
-      prevTasks.map((task: Task) =>
-        task.id === taskId ? { ...task, isComplete: isComplete } : task
+      sortTasks(
+        prevTasks.map((task: Task) =>
+          task.id === taskId ? { ...task, isComplete: isComplete } : task
+        )
       )
     );
     const res = await updateTask(taskId, isComplete);
     if (!res?.success) {
       // Revert the task state if the update fails
       setTasks((prevTasks: Tasks) =>
-        prevTasks.map((task: Task) =>
-          task.id === taskId ? { ...task, isComplete: !isComplete } : task
+        sortTasks(
+          prevTasks.map((task: Task) =>
+            task.id === taskId ? { ...task, isComplete: !isComplete } : task
+          )
         )
       );
     }
   };
+
   const completedTasks = () => {
     return tasks.filter((task: Task) => task.isComplete);
   };
+
   const clearCompletedTasks = async () => {
     const completed = completedTasks();
 
@@ -85,34 +91,33 @@ export default function Home() {
     setTasks([]);
   };
 
+  const sortTasks = useCallback((tasks: Tasks) => {
+    return tasks.sort((a, b) => {
+      if (isTaskOverdue(a) && !isTaskOverdue(b)) {
+        return -1;
+      }
+      if (!isTaskOverdue(a) && isTaskOverdue(b)) {
+        return 1;
+      }
+      if (a.dueDate && b.dueDate) {
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+      if (a.isComplete && !b.isComplete) {
+        return 1;
+      }
+      if (!a.isComplete && b.isComplete) {
+        return -1;
+      }
+      return 0;
+    });
+  }, []);
+
   useEffect(() => {
     if (tasks) {
       setLoading(false);
-      const sortTasks = (tasks: Tasks) => {
-        return tasks.sort((a, b) => {
-          if (isTaskOverdue(a) && !isTaskOverdue(b)) {
-            return -1;
-          }
-          if (!isTaskOverdue(a) && isTaskOverdue(b)) {
-            return 1;
-          }
-          if (a.dueDate && b.dueDate) {
-            return (
-              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-            );
-          }
-          if (a.isComplete && !b.isComplete) {
-            return 1;
-          }
-          if (!a.isComplete && b.isComplete) {
-            return -1;
-          }
-          return 0;
-        });
-      };
       setTasks(sortTasks(tasks));
     }
-  }, [tasks, setTasks]);
+  }, [tasks, sortTasks]);
 
   return (
     <div className="flex flex-1 flex-col md:mx-auto md:w-[720px] px-5">

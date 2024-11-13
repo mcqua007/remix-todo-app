@@ -187,7 +187,7 @@ export default function Home() {
 
       <footer className="mt-12">
         <p className="text-center text-sm leading-loose">
-          Built with ❤️ by Sean McQuaid
+          Built with ❤️ by a Software Developer
         </p>
       </footer>
     </div>

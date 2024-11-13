@@ -115,7 +115,7 @@ export default function Home() {
   }, [tasks, setTasks]);
 
   return (
-    <div className="flex flex-1 flex-col md:mx-auto md:w-[720px]">
+    <div className="flex flex-1 flex-col md:mx-auto md:w-[720px] px-5">
       <header className="my-12 flex items-center justify-between">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
           TODO
